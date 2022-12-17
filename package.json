@@ -1,6 +1,6 @@
 {
   "name": "koishi-plugin-marry",
-  "description": "\u0016Marry with your groupmate!",
+  "description": "Marry with your groupmate!",
   "version": "1.0.0",
   "main": "lib/index.js",
   "typings": "lib/index.d.ts",
