@@ -20,9 +20,7 @@ export function apply(ctx: Context, config: Config) {
 
   ctx.middleware((session, next) => {
     for (const i of config.keyword) {
-      if (session.content == i) {
-        session.execute('marry')
-      }
+      if (session.content === i) session.execute('marry')
     }
     return next()
   })
@@ -30,16 +28,15 @@ export function apply(ctx: Context, config: Config) {
   const setSessionGuildMemberList = async (session: Session): Promise<Universal.GuildMember[]> => {
     const guildMemberList = await session.bot.getGuildMemberList(session.guildId)
     // exclude bot itself
-    guildMemberList.splice(guildMemberList.findIndex((user)=> user.userId === session.bot.userId), 1)
+    guildMemberList.splice(guildMemberList.findIndex(user => user.userId === session.bot.userId), 1)
     guildMemberLists.set(session.gid, guildMemberList)
     return guildMemberList
   }
 
   const getSessionGuildMemberList = async (session: Session): Promise<Universal.GuildMember[]> => {
-    let guildMemberList: Universal.GuildMember[]
-    if (guildMemberLists.has(session.gid)) guildMemberList = Array.from(guildMemberLists.get(session.gid))
-    else guildMemberList = Array.from(await setSessionGuildMemberList(session))
-    guildMemberList.splice(guildMemberList.findIndex((user)=> user.userId === session.userId), 1)
+    let guildMemberList = Array.from(guildMemberLists.has(session.gid) ? guildMemberLists.get(session.gid) : await setSessionGuildMemberList(session))
+    // exclude user self
+    guildMemberList.splice(guildMemberList.findIndex(user => user.userId === session.userId), 1)
     return guildMemberList
   }
 
@@ -51,7 +48,8 @@ export function apply(ctx: Context, config: Config) {
   .action(async ({ session }) => {
     if (session.subtype === 'private') return
     const guildMemberList = await getSessionGuildMemberList(session)
-    
+
+    // pick user
     const marriedUser = Random.pick(guildMemberList)
 
     return <>
