@@ -1,3 +1,6 @@
-command:
+commands:
   marry:
     description: 娶群友，透群友！
+
+    messages:
+      today-couple: 你今日的群友是：

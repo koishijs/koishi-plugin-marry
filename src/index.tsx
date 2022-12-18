@@ -54,7 +54,7 @@ export function apply(ctx: Context, config: Config) {
 
     return <>
       <quote id={session.messageId}/>
-      你今日的群友是：{marriedUser.username}
+      <i18n path=".today-couple"/>{marriedUser.username}
       <image url={marriedUser.avatar}/>
     </>
   })
