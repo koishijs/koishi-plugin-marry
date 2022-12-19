@@ -3,4 +3,5 @@ commands:
     description: 娶群友，透群友！
 
     messages:
-      today-couple: 你今日的群友是：
+        today-couple: 你今日的群友老婆是：
+        members-too-few: 群成员太少啦，快去拐骗（？）点老婆回来吧！
