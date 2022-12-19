@@ -10,7 +10,7 @@ export const Config: Schema<Config> = Schema.object({
   keyword: Schema.union([
     Schema.array(String),
     Schema.transform(String, (prefix) => [prefix]),
-  ] as const).description('触发娶群友的关键词').default(['今日群友']),
+  ] as const).description('触发娶群友的关键词').default(['今日老婆']),
 })
 
 const guildMemberLists = new Map<string, Universal.GuildMember[]>()
@@ -34,15 +34,18 @@ export function apply(ctx: Context, config: Config) {
   }
 
   const getSessionGuildMemberList = async (session: Session): Promise<Universal.GuildMember[]> => {
-    let guildMemberList = Array.from(guildMemberLists.has(session.gid) ? guildMemberLists.get(session.gid) : await setSessionGuildMemberList(session))
+    const guildMemberList = Array.from(guildMemberLists.has(session.gid) ? guildMemberLists.get(session.gid) : await setSessionGuildMemberList(session))
     // exclude user self
     guildMemberList.splice(guildMemberList.findIndex(user => user.userId === session.userId), 1)
     return guildMemberList
   }
 
-  ctx.on('guild-member-added', async (session) => {
+  const onMemberUpdate = async (session: Session) => {
     if (guildMemberLists.has(session.gid)) setSessionGuildMemberList(session)
-  })
+  }
+
+  ctx.on('guild-member-added', onMemberUpdate)
+  ctx.on('guild-member-deleted', onMemberUpdate)
 
   ctx.command('marry')
   .action(async ({ session }) => {
@@ -53,9 +56,9 @@ export function apply(ctx: Context, config: Config) {
     const marriedUser = Random.pick(guildMemberList)
 
     return <>
-      <quote id={session.messageId}/>
-      <i18n path=".today-couple"/>{marriedUser.username}
-      <image url={marriedUser.avatar}/>
+      <quote id={session.messageId} />
+      <i18n path=".today-couple" />{marriedUser.nickname ? marriedUser.nickname : marriedUser.username}
+      <image url={marriedUser.avatar} />
     </>
   })
 }
