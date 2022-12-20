@@ -1,9 +1,18 @@
 {
   "name": "koishi-plugin-marry",
   "description": "Marry with your groupmate!",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/koishijs/koishi-plugin-marry.git"
+  },
+  "bugs": {
+    "url": "https://github.com/koishijs/koishi-plugin-marry/issues"
+  },
+  "homepage": "https://github.com/koishijs/koishi-plugin-marry",
   "version": "1.0.0",
   "main": "lib/index.js",
   "typings": "lib/index.d.ts",
+  "author": "Seidko <seidko.coding@gmail.com>",
   "files": [
     "lib",
     "dist"
@@ -11,11 +20,24 @@
   "license": "MIT",
   "scripts": {},
   "keywords": [
+    "bot",
     "chatbot",
     "koishi",
-    "plugin"
+    "plugin",
+    "marry"
   ],
   "peerDependencies": {
     "koishi": "4.10.6"
+  },
+  "koishi": {
+    "description": {
+      "en": "Marry with your groupmate!",
+      "zh": "娶群友！快来寻找你今天的群友老婆吧！"
+    },
+    "service": {
+      "required": [
+        "database"
+      ]
+    }
   }
 }
