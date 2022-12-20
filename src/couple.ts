@@ -38,10 +38,14 @@ export default class couple {
 
     // schedule clean up
     ;(async () => {
-      const cleanUpMarriages = () => ctx.database.set('channel', {}, { marriages: {} })
+      const cleanUpMarriages = async () => {
+        ctx.database.set('channel', {}, { marriages: {} })
+        await ctx.database.set('marry_data', {}, { latestCleanUpTime: new Date() })
+      }
+
       const getNextCleanUpTime = () => new Date(new Date().toLocaleDateString()).getTime() + 86400000 - Date.now()
-      const cleanUp = () => {
-        cleanUpMarriages()
+      const cleanUp = async () => {
+        await cleanUpMarriages()
         ctx.setTimeout(cleanUp, getNextCleanUpTime())
       }
 
@@ -51,10 +55,7 @@ export default class couple {
         latestCleanUpTime = 0
       }
 
-      if (Date.now() - latestCleanUpTime > 86400000) {
-        cleanUpMarriages()
-        await ctx.database.set('marry_data', {}, { latestCleanUpTime: new Date() })
-      }
+      if (Date.now() - latestCleanUpTime > 86400000) await cleanUpMarriages()
 
       ctx.setTimeout(cleanUp, getNextCleanUpTime())
     })()
