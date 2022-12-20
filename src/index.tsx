@@ -1,4 +1,4 @@
-import { Schema, Context, Universal, Session, Random } from 'koishi'
+import { Schema, Context } from 'koishi'
 import Couple from './couple'
 
 export const name = 'marry'
