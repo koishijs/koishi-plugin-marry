@@ -9,7 +9,7 @@
     "url": "https://github.com/koishijs/koishi-plugin-marry/issues"
   },
   "homepage": "https://github.com/koishijs/koishi-plugin-marry",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "main": "lib/index.js",
   "typings": "lib/index.d.ts",
   "author": "Seidko <seidko.coding@gmail.com>",
