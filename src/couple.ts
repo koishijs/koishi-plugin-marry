@@ -3,8 +3,8 @@ import { Context, Universal, Session, Random } from "koishi"
 const guildMemberLists = new Map<string, Universal.GuildMember[]>()
 
 interface MarryData {
-  id: number
-  latestCleanUpTime: Date
+  key: string
+  value: string
 }
 
 declare module 'koishi' {
@@ -28,8 +28,10 @@ export default class couple {
 
     // because koishi have no place to store global data, so I create a table to store these data.
     ctx.model.extend('marry_data', {
-      id: 'unsigned',
-      latestCleanUpTime: 'timestamp',
+      key: 'string',
+      value: 'string',
+    }, {
+      primary: 'key'
     })
 
     // update member list on guild member change
@@ -38,9 +40,11 @@ export default class couple {
 
     // schedule clean up
     ;(async () => {
+      await ctx.database.set('channel', {}, { marriages: {aaa: 'aa'} })
+
       const cleanUpMarriages = async () => {
         ctx.database.set('channel', {}, { marriages: {} })
-        await ctx.database.set('marry_data', {}, { latestCleanUpTime: new Date() })
+        await ctx.database.set('marry_data', { key: { $eq: 'latestCleanUpTime' }}, { value: Date.now().toString() })
       }
 
       const getNextCleanUpTime = () => new Date(new Date().toLocaleDateString()).getTime() + 86400000 - Date.now()
@@ -49,9 +53,9 @@ export default class couple {
         ctx.setTimeout(cleanUp, getNextCleanUpTime())
       }
 
-      let latestCleanUpTime = (await ctx.database.get('marry_data', {}))[0]?.latestCleanUpTime?.getTime()
+      let latestCleanUpTime = Number((await ctx.database.get('marry_data', { key: { $eq: 'latestCleanUpTime' }}))[0]?.value)
       if (!latestCleanUpTime) {
-        await ctx.database.create('marry_data', { id: 0, latestCleanUpTime: new Date() })
+        await ctx.database.create('marry_data', { key: 'latestCleanUpTime', value: Date.now().toString() })
         latestCleanUpTime = 0
       }
 
