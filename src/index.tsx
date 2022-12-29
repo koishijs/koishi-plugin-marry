@@ -33,7 +33,7 @@ export async function apply(ctx: Context, config: Config) {
     const marriedUser = await couple.getCouple(session)
 
     // if there are no user to pick, return with "members-too-few"
-    if (!marriedUser) return <i18n path="members-too-few" />
+    if (!marriedUser) return <i18n path=".members-too-few" />
     return <>
       <quote id={session.messageId} />
       <i18n path=".today-couple" />{marriedUser.nickname ? marriedUser.nickname : marriedUser.username}
