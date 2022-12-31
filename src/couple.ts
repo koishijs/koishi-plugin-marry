@@ -79,14 +79,10 @@ export default class couple {
   }
 
   protected async setMemberList(session: Session): Promise<Universal.GuildMember[]> {
-    let guildMemberList = await session.bot.getGuildMemberList(session.guildId)
+    const guildMemberList = await session.bot.getGuildMemberList(session.guildId)
 
     // exclude bot itself
     guildMemberList.splice(guildMemberList.findIndex(user => user.userId === session.bot.userId), 1)
-
-    // exclude married user
-    const marriedUsersId = Object.entries((await this.ctx.database.getChannel(session.platform, session.channelId, ['marriages'])).marriages).flat()
-    guildMemberList = complement(guildMemberList, marriedUsersId.map(userId => guildMemberList.find(member => member.userId === userId)))
 
     // save list to map
     guildMemberLists.set(session.gid, guildMemberList)
@@ -101,9 +97,12 @@ export default class couple {
   }
 
   protected async pickCouple(session: Session): Promise<Universal.GuildMember> {
-    const couple = Random.pick(await this.getMemberList(session))
-    const guildMemberList = guildMemberLists.get(session.gid)
-    guildMemberList.splice(guildMemberList.findIndex(member => member === couple), 1)
+    const guildMemberList = await this.getMemberList(session)
+
+    // exclude married user
+    const marriedUsersId = Object.entries((await this.ctx.database.getChannel(session.platform, session.channelId, ['marriages'])).marriages).flat()
+    const couple = Random.pick(complement(guildMemberList, marriedUsersId.map(userId => guildMemberList.find(member => member.userId === userId))))
+
     return couple
   }
 
