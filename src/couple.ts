@@ -53,8 +53,6 @@ export default class couple {
 
     // schedule clean up
     ;(async () => {
-      await ctx.database.set('channel', {}, { marriages: {aaa: 'aa'} })
-
       const cleanUpMarriages = async () => {
         ctx.database.set('channel', {}, { marriages: {} })
         await ctx.database.set('marry_data_v2', { key: { $eq: 'latestCleanUpTime' }}, { value: Date.now().toString() })
