@@ -1,4 +1,5 @@
 import { Context, Universal, Session, Random } from "koishi"
+import './types'
 
 const guildMemberLists = new Map<string, Universal.GuildMember[]>()
 
@@ -31,9 +32,11 @@ function complement<T = any>(a: T[], b: T[]): T[] {
 
 export default class couple {
   protected ctx: Context
+  protected config: marry.Config
 
-  constructor(ctx: Context) {
+  constructor(ctx: Context, config: marry.Config) {
     this.ctx = ctx
+    this.config = config
 
     ctx.model.extend('channel', {
       marriages: 'json',
@@ -95,12 +98,21 @@ export default class couple {
   }
 
   protected async pickCouple(session: Session): Promise<Universal.GuildMember> {
-    const guildMemberList = await this.getMemberList(session)
+    let guildMemberList = await this.getMemberList(session)
 
     // exclude married user
     const marriedUsersId = Object.entries((await this.ctx.database.getChannel(session.platform, session.channelId, ['marriages'])).marriages).flat()
-    const couple = Random.pick(complement(guildMemberList, marriedUsersId.map(userId => guildMemberList.find(member => member.userId === userId))))
+    guildMemberList = complement(guildMemberList, marriedUsersId.map(userId => guildMemberList.find(member => member.userId === userId)))
 
+    // exclude user that excluded in config
+    for (const user of this.config.excludedUsers) {
+      if (user.platform === session.platform) {
+        guildMemberList.splice(guildMemberList.findIndex(user => user.userId === session.bot.userId), 1)
+      }
+    }
+
+    // pick couple
+    const couple = Random.pick(guildMemberList)
     return couple
   }
 
