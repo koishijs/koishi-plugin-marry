@@ -1,21 +1,18 @@
 import { Schema, Context } from 'koishi'
 import Couple from './couple'
+import './types'
 
 export const name = 'marry'
 export const using = ['database'] as const
 
-export interface Config {
-  keyword: string[]
-}
-
-export const Config: Schema<Config> = Schema.object({
+export const Config : Schema<marry.Config> = Schema.object({
   keyword: Schema.union([
     Schema.array(String),
     Schema.transform(String, (prefix) => [prefix]),
   ] as const).description('触发娶群友的关键词').default(['今日老婆']),
 })
 
-export async function apply(ctx: Context, config: Config) {
+export async function apply(ctx: Context, config: marry.Config) {
   ctx.i18n.define('zh', require('./locales/zh-CN'))
 
   const couple = new Couple(ctx)
