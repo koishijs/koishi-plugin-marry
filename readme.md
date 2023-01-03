@@ -20,6 +20,9 @@
   - id: 用户ID，在QQ平台即为QQ号
   - note: 备注，仅用于标识作用，可不填
 
+## 新的想法或问题反馈
+如果你对插件改进有想法或者需要某种功能，又或者是遇到了bug，欢迎在 [`issue`](https://github.com/koishijs/koishi-plugin-marry/issues/new/choose) 页面写出你的想法或者提供反馈~
+
 ## License
 
 使用 [MIT](./LICENSE) 许可证发布。
