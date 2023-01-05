@@ -4,6 +4,18 @@ import './types'
 
 export const name = 'marry'
 export const using = ['database'] as const
+export const usage = `### 配置说明
+
+- keyword: 触发娶群友的关键词列表
+- 默认值为 "今日老婆"
+- excludedUsers: 排除的用户，可以排除诸如Q群管家或者其他机器人账号
+- platform: 平台名称（QQ平台名为onebot）
+- id: 用户ID，在QQ平台即为QQ号
+- note: 备注，仅用于标识作用，可不填
+
+### 问题反馈
+
+小伙伴如果遇到问题或者有新的想法，欢迎到[这里](http://github.com/koishijs/koishi-plugin-marry/issues/new)反馈哦~`
 
 export const Config : Schema<marry.Config> = Schema.object({
   keyword: Schema.union([
