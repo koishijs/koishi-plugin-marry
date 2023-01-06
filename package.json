@@ -12,7 +12,11 @@
   "version": "1.2.0",
   "main": "lib/index.js",
   "typings": "lib/index.d.ts",
-  "author": "Seidko <seidko.coding@gmail.com>",
+  "author": {
+    "email": "seidko.coding@gmail.com",
+    "name": "Seidko",
+    "url": "https://github.com/Seidko"
+  },
   "files": [
     "lib",
     "dist"
@@ -36,7 +40,7 @@
   },
   "koishi": {
     "description": {
-      "en": "Marry with your groupmate!",
+      "en": "Find your everyday groupmate!",
       "zh": "娶群友！快来寻找你今天的群友老婆吧！"
     },
     "service": {

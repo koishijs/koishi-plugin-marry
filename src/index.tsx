@@ -7,15 +7,15 @@ export const using = ['database'] as const
 export const usage = `### 配置说明
 
 - keyword: 触发娶群友的关键词列表
-- 默认值为 "今日老婆"
+  - 默认值为 "今日老婆"
 - excludedUsers: 排除的用户，可以排除诸如Q群管家或者其他机器人账号
-- platform: 平台名称（QQ平台名为onebot）
-- id: 用户ID，在QQ平台即为QQ号
-- note: 备注，仅用于标识作用，可不填
+  - platform: 平台名称（QQ平台名为onebot）
+  - id: 用户ID，在QQ平台即为QQ号
+  - note: 备注，仅用于标识作用，可不填
 
 ### 问题反馈
 
-小伙伴如果遇到问题或者有新的想法，欢迎到[这里](http://github.com/koishijs/koishi-plugin-marry/issues/new)反馈哦~`
+小伙伴如果遇到问题或者有新的想法，欢迎到[这里](https://github.com/koishijs/koishi-plugin-marry/issues/new/choose)反馈哦~`
 
 export const Config : Schema<marry.Config> = Schema.object({
   keyword: Schema.union([
@@ -26,7 +26,9 @@ export const Config : Schema<marry.Config> = Schema.object({
     platform: Schema.string().description('平台名（QQ平台名为onebot）').required(),
     id: Schema.string().description('用户ID').required(),
     note: Schema.string().description('备注（可不填此项）'),
-  })).description('排除的用户').default([{ platform: 'onebot', id: '2854196310', note: 'Q群管家' }]),
+  })).description('排除的用户').default([
+    { platform: 'onebot', id: '2854196310', note: 'Q群管家' }
+  ]),
 })
 
 export async function apply(ctx: Context, config: marry.Config) {
