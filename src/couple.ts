@@ -107,7 +107,8 @@ export default class couple {
     // exclude user that excluded in config
     for (const user of this.config.excludedUsers) {
       if (user.platform === session.platform) {
-        guildMemberList.splice(guildMemberList.findIndex(userInList => userInList.userId === user.id), 1)
+        const index = guildMemberList.findIndex(userInList => userInList.userId === user.id)
+        if (index != -1) guildMemberList.splice(index, 1)
       }
     }
 
