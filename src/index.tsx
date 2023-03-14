@@ -29,6 +29,11 @@ export const Config : Schema<marry.Config> = Schema.object({
   })).description('排除的用户').default([
     { platform: 'onebot', id: '2854196310', note: 'Q群管家' }
   ]),
+  includedUsers: Schema.array(Schema.object({
+    platform: Schema.string().description('平台名（QQ平台名为onebot）').required(),
+    id: Schema.string().description('用户ID').required(),
+    note: Schema.string().description('备注（可不填此项）'),
+  })).description("包含的用户").default([])
 })
 
 export async function apply(ctx: Context, config: marry.Config) {
