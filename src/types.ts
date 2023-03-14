@@ -5,6 +5,11 @@ namespace marry {
       platform: string
       id: string
       note: string
+    }[],
+    includedUsers: {
+      platform: string
+      id: string
+      note: string
     }[]
   }    
 }

@@ -104,6 +104,22 @@ export default class couple {
     const marriedUsersId = Object.entries((await this.ctx.database.getChannel(session.platform, session.channelId, ['marriages'])).marriages).flat()
     guildMemberList = complement(guildMemberList, marriedUsersId.map(userId => guildMemberList.find(member => member.userId === userId)))
 
+    // only included user will be picked in the condition below
+    // otherwise, all users will be picked.
+    if(this.config.includedUsers.length > 0){
+      const newList = [];
+      for (const user of this.config.includedUsers) {
+        if (user.platform === session.platform) {
+          const index = guildMemberList.findIndex(userInList => userInList.userId === user.id)
+          if (index != -1) {
+            newList.push(guildMemberList[index]);
+          }
+        }
+      }
+      guildMemberList = newList;
+    }
+     
+
     // exclude user that excluded in config
     for (const user of this.config.excludedUsers) {
       if (user.platform === session.platform) {
