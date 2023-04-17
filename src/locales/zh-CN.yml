@@ -4,4 +4,5 @@ commands:
 
     messages:
         today-couple: 你今日的群友老婆是：
+        today-husband: 你今日的群友老公是：
         members-too-few: 群成员太少啦，快去拐骗（？）点老婆回来吧！

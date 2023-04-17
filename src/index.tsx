@@ -1,4 +1,4 @@
-import { Schema, Context } from 'koishi'
+import { Schema, Context, Universal } from 'koishi'
 import Couple from './couple'
 import './types'
 
@@ -12,6 +12,8 @@ export const usage = `### 配置说明
   - platform: 平台名称（QQ平台名为onebot）
   - id: 用户ID，在QQ平台即为QQ号
   - note: 备注，仅用于标识作用，可不填
+- roles: 区分角色
+  - 开启后将会使你的爱情双向奔赴
 
 ### 问题反馈
 
@@ -29,6 +31,7 @@ export const Config : Schema<marry.Config> = Schema.object({
   })).description('排除的用户').default([
     { platform: 'onebot', id: '2854196310', note: 'Q群管家' }
   ]),
+  roles: Schema.boolean().default(false).description('是否区分角色')
 })
 
 export async function apply(ctx: Context, config: marry.Config) {
@@ -46,13 +49,18 @@ export async function apply(ctx: Context, config: marry.Config) {
   ctx.command('marry')
     .action(async ({ session }) => {
       if (session.subtype === 'private') return
-      const marriedUser = await couple.getCouple(session)
 
+      const marriedUser:Universal.GuildMember = await couple.getCouple(session)
+      
       // if there are no user to pick, return with "members-too-few"
       if (!marriedUser) return <i18n path=".members-too-few" />
+      let couple_path :string ='.today-couple'
+      if(marriedUser['roles'].indexOf('husband')>-1 && config.roles){
+        couple_path=".today-husband"
+      }
       return <>
         <quote id={session.messageId} />
-        <i18n path=".today-couple" />{marriedUser.nickname ? marriedUser.nickname : marriedUser.username}
+        <i18n path={couple_path} />{marriedUser.nickname ? marriedUser.nickname : marriedUser.username}
         <image url={marriedUser.avatar} />
       </>
     })

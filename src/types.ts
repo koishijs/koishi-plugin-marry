@@ -6,5 +6,6 @@ namespace marry {
       id: string
       note: string
     }[]
+    roles: boolean
   }    
 }

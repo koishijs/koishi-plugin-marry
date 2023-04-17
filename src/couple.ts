@@ -126,19 +126,13 @@ export default class couple {
 
     let couple: Universal.GuildMember
     const marriages = (await this.ctx.database.getChannel(session.platform, session.channelId, ['marriages'])).marriages
-
+    
     // will implement top-bottom system
-    for (const [top, bottom] of Object.entries(marriages)) {
-      if (top === session.userId) {
-        couple = guildMemberList.find(user => user.userId === bottom)
-        break
-      }
-      else if (bottom === session.userId) {
-        couple = guildMemberList.find(user => user.userId === top)
-        break
-      }
-    }
-
+    const spouseId = Object.entries(marriages).find(([top, bottom]) => [top, bottom].includes(session.userId))
+    if (!spouseId) return null
+    const [top, bottom] = spouseId
+    couple = guildMemberList.find(user => user.userId === (top === session.userId ? bottom : top))
+    if (bottom === session.userId) couple['roles'].push('husband')
     if (!couple) {
       // pick user
       couple = await this.pickCouple(session)
