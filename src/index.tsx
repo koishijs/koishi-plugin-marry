@@ -77,7 +77,7 @@ export async function apply(ctx: Context, config: Config) {
       return session.text('.marriages', {
         quote: h('quote', { id: session.messageId }),
         name: couple.nickname ?? couple.user.name,
-        avatar: h.image(couple.user.avatar)
+        avatar: h.image(couple.user.avatar, { cache: false })
       })
     })
 }
