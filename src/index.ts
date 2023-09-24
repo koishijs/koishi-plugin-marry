@@ -69,7 +69,7 @@ export async function apply(ctx: Context, config: Config) {
         }))
 
         couple = weightedPick(map)
-        if (!couple) return <i18n path=".members-too-few" />
+        if (!couple) return h.i18n('.members-too-few')
         const coupleFid = `${session.platform}:${session.guildId}:${couple.user.id}`
         marriages[session.fid] = coupleFid
         marriages[coupleFid] = session.fid
