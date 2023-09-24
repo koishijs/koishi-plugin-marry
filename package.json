@@ -9,7 +9,7 @@
     "url": "https://github.com/koishijs/koishi-plugin-marry/issues"
   },
   "homepage": "https://github.com/koishijs/koishi-plugin-marry",
-  "version": "1.2.2",
+  "version": "2.0.0",
   "main": "lib/index.js",
   "typings": "lib/index.d.ts",
   "author": {
@@ -45,7 +45,7 @@
     },
     "service": {
       "required": [
-        "database"
+        "messages"
       ]
     }
   }

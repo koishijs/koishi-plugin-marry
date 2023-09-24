@@ -1,13 +1,10 @@
-import { Schema, Context } from 'koishi'
-import Couple from './couple'
-import './types'
+import { Schema, Context, Universal, $, h } from 'koishi'
+import { fromAsync, weightedPick } from './utils'
+import { } from 'koishi-plugin-messages'
 
 export const name = 'marry'
 export const using = ['database'] as const
 export const usage = `### 配置说明
-
-- keyword: 触发娶群友的关键词列表
-  - 默认值为 "今日老婆"
 - excludedUsers: 排除的用户，可以排除诸如Q群管家或者其他机器人账号
   - platform: 平台名称（QQ平台名为onebot）
   - id: 用户ID，在QQ平台即为QQ号
@@ -17,11 +14,15 @@ export const usage = `### 配置说明
 
 小伙伴如果遇到问题或者有新的想法，欢迎到[这里](https://github.com/koishijs/koishi-plugin-marry/issues/new/choose)反馈哦~`
 
-export const Config : Schema<marry.Config> = Schema.object({
-  keyword: Schema.union([
-    Schema.array(String),
-    Schema.transform(String, keyword => [keyword]),
-  ] as const).description('触发娶群友的关键词').default(['今日老婆']),
+interface Config {
+  excludedUsers: {
+    platform: string
+    id: string
+    note: string
+  }[]
+}
+
+export const Config: Schema<Config> = Schema.object({
   excludedUsers: Schema.array(Schema.object({
     platform: Schema.string().description('平台名（QQ平台名为onebot）').required(),
     id: Schema.string().description('用户ID').required(),
@@ -31,29 +32,51 @@ export const Config : Schema<marry.Config> = Schema.object({
   ]),
 })
 
-export async function apply(ctx: Context, config: marry.Config) {
+const marriages: Record<string, string> = {}
+
+export async function apply(ctx: Context, config: Config) {
   ctx.i18n.define('zh', require('./locales/zh-CN'))
 
-  const couple = new Couple(ctx, config)
-
-  ctx.middleware((session, next) => {
-    for (const i of config.keyword) {
-      if (session.content === i) session.execute('marry')
-    }
-    return next()
-  })
 
   ctx.command('marry')
     .action(async ({ session }) => {
-      if (session.subtype === 'private') return
-      const marriedUser = await couple.getCouple(session)
+      if (!session.guildId) return
 
-      // if there are no user to pick, return with "members-too-few"
-      if (!marriedUser) return <i18n path=".members-too-few" />
-      return <>
-        <quote id={session.messageId} />
-        <i18n path=".today-couple" />{marriedUser.nickname ? marriedUser.nickname : marriedUser.username}
-        <image url={marriedUser.avatar} />
-      </>
+      const excludes = [
+        session.userId,
+        session.selfId,
+        ...config.excludedUsers.map(u => u.platform === session.platform ? u.id : undefined).filter(Boolean)
+      ]
+      let couple: Universal.GuildMember
+
+      if (marriages[session.fid]) {
+        const userId = marriages[session.fid].split(':')[2]
+        couple = await session.bot.getGuildMember(session.guildId, userId)
+      } else {
+        const count = await ctx.database
+          .select('chat.message')
+          .where(row => $.and($.eq(row.platform, session.platform), $.eq(row.guildId, session.guildId)))
+          .groupBy(['userId'], {
+            activity: row => $.count(row.userId)
+          })
+          .execute()
+
+        const members = await fromAsync(session.bot.getGuildMemberIter(session.guildId))
+        const map = new Map(members.filter(m => !excludes.includes(m.user.id)).map(m => {
+          const { activity = 0 } = count.find(({ userId }) => userId === m.user.id) ?? {}
+          return [m, activity + 1]
+        }))
+
+        couple = weightedPick(map)
+        if (!couple) return <i18n path=".members-too-few" />
+        const coupleFid = `${session.platform}:${session.guildId}:${couple.user.id}`
+        marriages[session.fid] = coupleFid
+        marriages[coupleFid] = session.fid
+      }
+      return session.text('.marriages', {
+        quote: h('quote', { id: session.messageId }),
+        name: couple.nickname ?? couple.user.name,
+        avatar: h.image(couple.user.avatar)
+      })
     })
 }
