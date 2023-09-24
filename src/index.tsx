@@ -1,9 +1,10 @@
 import { Schema, Context, Universal, $, h } from 'koishi'
 import { fromAsync, weightedPick } from './utils'
 import { } from 'koishi-plugin-messages'
+import { } from 'koishi-plugin-cron'
 
 export const name = 'marry'
-export const using = ['database'] as const
+export const using = ['database', '__cron__'] as const
 export const usage = `### 配置说明
 - excludedUsers: 排除的用户，可以排除诸如Q群管家或者其他机器人账号
   - platform: 平台名称（QQ平台名为onebot）
@@ -32,11 +33,11 @@ export const Config: Schema<Config> = Schema.object({
   ]),
 })
 
-const marriages: Record<string, string> = {}
+let marriages: Record<string, string> = {}
 
 export async function apply(ctx: Context, config: Config) {
   ctx.i18n.define('zh', require('./locales/zh-CN'))
-
+  ctx.cron('0 0 * * *', () => marriages = {})
 
   ctx.command('marry')
     .action(async ({ session }) => {

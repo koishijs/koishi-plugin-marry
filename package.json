@@ -36,7 +36,9 @@
     "koishi": "^4.11.0"
   },
   "devDependencies": {
-    "atsc": "^1.2.2"
+    "atsc": "^1.2.2",
+    "koishi-plugin-cron": "^2.0.5",
+    "koishi-plugin-messages": "^0.2.2"
   },
   "koishi": {
     "description": {
@@ -45,7 +47,8 @@
     },
     "service": {
       "required": [
-        "messages"
+        "messages",
+        "cron"
       ]
     }
   }
