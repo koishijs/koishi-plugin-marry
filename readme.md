@@ -13,8 +13,6 @@
 
 ## 配置项
 
-- keyword: 触发娶群友的关键词列表
-  - 默认值为 "今日老婆"
 - excludedUsers: 排除的用户，可以排除诸如Q群管家或者其他机器人账号
   - platform: 平台名称（QQ平台名为onebot）
   - id: 用户ID，在QQ平台即为QQ号
