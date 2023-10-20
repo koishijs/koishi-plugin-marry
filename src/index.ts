@@ -48,36 +48,58 @@ export async function apply(ctx: Context, config: Config) {
         session.selfId,
         ...config.excludedUsers.map(u => u.platform === session.platform ? u.id : undefined).filter(Boolean)
       ]
-      let couple: Universal.GuildMember
+      let couple: Universal.GuildMember & { userId?: string, nickname?: string }
 
       if (marriages[session.fid]) {
         const userId = marriages[session.fid].split(':')[2]
-        couple = await session.bot.getGuildMember(session.guildId, userId)
+        try {
+          couple = await session.bot.getGuildMember(session.guildId, userId)
+        } catch {
+          const count = await ctx.database
+            .select('chat.message')
+            .where(row => $.and($.eq(row.platform, session.platform), $.eq(row.channelId, session.channelId), $.eq(row.userId, userId)))
+            .execute()
+          const info = count.at(-1)
+          couple = {
+            user: {
+              id: userId,
+              name: info.nickname,
+              avatar: info.avatar
+            }
+          }
+        }
       } else {
         const count = await ctx.database
           .select('chat.message')
-          .where(row => $.and($.eq(row.platform, session.platform), $.eq(row.guildId, session.guildId)))
-          .groupBy(['userId'], {
+          .where(row => $.and($.eq(row.platform, session.platform), $.eq(row.channelId, session.channelId)))
+          .groupBy(['userId', 'nickname', 'avatar'], {
             activity: row => $.count(row.userId)
           })
           .execute()
 
         const members = await fromAsync(session.bot.getGuildMemberIter(session.guildId))
-        const map = new Map(members.filter(m => !excludes.includes(m.user.id)).map(m => {
-          const { activity = 0 } = count.find(({ userId }) => userId === m.user.id) ?? {}
-          return [m, activity + 1]
-        }))
+        let map
+        if (members.length === 0) {
+          map = new Map(count.filter(m => !excludes.includes(m.userId)).map(m => {
+            return [m, m.activity + 1]
+          }))
+        } else {
+          map = new Map(members.filter(m => !excludes.includes(m.user.id)).map(m => {
+            const { activity = 0 } = count.find(({ userId }) => userId === m.user.id) ?? {}
+            return [m, activity + 1]
+          }))
+        }
 
         couple = weightedPick(map)
         if (!couple) return h.i18n('.members-too-few')
-        const coupleFid = `${session.platform}:${session.guildId}:${couple.user.id}`
+        const coupleFid = `${session.platform}:${session.guildId}:${couple.userId ?? couple.user.id}`
         marriages[session.fid] = coupleFid
         marriages[coupleFid] = session.fid
       }
       return session.text('.marriages', {
         quote: h('quote', { id: session.messageId }),
         name: couple.nickname ?? couple.user.name,
-        avatar: h.image(couple.user.avatar, { cache: false })
+        avatar: h.image(couple.avatar ?? couple.user.avatar, { cache: false })
       })
     })
 }
