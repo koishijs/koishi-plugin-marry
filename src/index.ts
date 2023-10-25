@@ -92,14 +92,14 @@ export async function apply(ctx: Context, config: Config) {
 
         couple = weightedPick(map)
         if (!couple) return h.i18n('.members-too-few')
-        const coupleFid = `${session.platform}:${session.guildId}:${couple.userId ?? couple.user.id}`
+        const coupleFid = `${session.platform}:${session.guildId}:${couple.userId ?? couple.user?.id}`
         marriages[session.fid] = coupleFid
         marriages[coupleFid] = session.fid
       }
       return session.text('.marriages', {
         quote: h('quote', { id: session.messageId }),
-        name: couple.nickname ?? couple.user.name,
-        avatar: h.image(couple.avatar ?? couple.user.avatar, { cache: false })
+        name: couple.nickname ?? couple.user?.name,
+        avatar: h.image(couple.avatar ?? couple.user?.avatar, { cache: false })
       })
     })
 }
