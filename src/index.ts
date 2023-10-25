@@ -65,7 +65,8 @@ export async function apply(ctx: Context, config: Config) {
               id: userId,
               name: info.nickname,
               avatar: info.avatar
-            }
+            },
+            nick: info.nickname
           }
         }
       } else {
@@ -98,7 +99,7 @@ export async function apply(ctx: Context, config: Config) {
       }
       return session.text('.marriages', {
         quote: h('quote', { id: session.messageId }),
-        name: couple.nickname ?? couple.user?.name,
+        name: couple.nickname ?? couple.nick,
         avatar: h.image(couple.avatar ?? couple.user?.avatar, { cache: false })
       })
     })
